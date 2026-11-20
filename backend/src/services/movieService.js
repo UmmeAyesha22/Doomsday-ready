@@ -1,5 +1,6 @@
 const db = require('../db');
 const AppError = require('../errors/AppError');
+const { findCycle } = require('../algorithms/cycleCheck');
 
 // One query that returns a movie together with its prerequisite ids
 const SELECT_MOVIES = `
@@ -63,6 +64,31 @@ function translateDbError(err) {
   return err;
 }
 
+
+// Loads the current prerequisite links, leaving out this movie's own links
+// (they are about to be replaced), and checks for a circular dependency.
+async function assertNoCycle(client, movieId, newPrerequisiteIds) {
+  const { rows } = await client.query(
+    'SELECT movie_id, prerequisite_id FROM movie_prerequisites WHERE movie_id <> $1',
+    [movieId]
+  );
+
+  const prerequisitesOf = new Map();
+  for (const row of rows) {
+    if (!prerequisitesOf.has(row.movie_id)) prerequisitesOf.set(row.movie_id, []);
+    prerequisitesOf.get(row.movie_id).push(row.prerequisite_id);
+  }
+
+  const cycle = findCycle(movieId, newPrerequisiteIds, prerequisitesOf);
+  if (cycle) {
+    throw new AppError(
+      409,
+      'CIRCULAR_DEPENDENCY',
+      `This would create a circular dependency: ${cycle.join(' -> ')}`
+    );
+  }
+}
+
 async function listMovies() {
   const { rows } = await db.query(`${SELECT_MOVIES} ORDER BY m.id`);
   return rows.map(toMovie);
@@ -106,13 +132,8 @@ async function updateMovie(id, data) {
       }
 
       if (data.prerequisites !== undefined) {
-        if (data.prerequisites.includes(id)) {
-          throw new AppError(409, 'CIRCULAR_DEPENDENCY', 'A movie cannot be its own prerequisite');
-        }
         await assertPrerequisitesExist(client, data.prerequisites);
-
-        // STEP 4: the full cycle check (A -> B -> C -> A) will go here
-
+        await assertNoCycle(client, id, data.prerequisites);
         await replacePrerequisites(client, id, data.prerequisites);
       }
 
