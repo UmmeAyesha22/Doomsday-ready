@@ -60,6 +60,7 @@ async function createCinema(data) {
   }
 }
 
+
 async function getBookingQuote(id, groupSize) {
   const cinema = await getCinema(id);
   const result = findMinBundles(cinema.bundleSizes, groupSize);
