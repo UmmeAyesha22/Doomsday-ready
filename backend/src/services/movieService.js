@@ -1,6 +1,7 @@
 const db = require('../db');
 const AppError = require('../errors/AppError');
 const { findCycle } = require('../algorithms/cycleCheck');
+const { buildRewatchOrder } = require('../algorithms/rewatchOrder');
 
 // One query that returns a movie together with its prerequisite ids
 const SELECT_MOVIES = `
@@ -160,4 +161,32 @@ async function updateMovie(id, data) {
   }
 }
 
-module.exports = { listMovies, createMovie, updateMovie };
+  async function getRewatchOrder(id) {
+      const movies = await listMovies();
+      const byId = new Map(movies.map((movie) => [movie.id, movie]));
+
+      const target = byId.get(id);
+      if (!target) {
+        throw new AppError(404, 'MOVIE_NOT_FOUND', `Movie ${id} not found`);
+      }
+
+      const prerequisitesOf = new Map(movies.map((movie) => [movie.id, movie.prerequisites]));
+      const order = buildRewatchOrder(id, prerequisitesOf).map((movieId) => byId.get(movieId));
+
+      const unwatched = order.filter((movie) => !movie.watched);
+
+  return {
+      target: { id: target.id, title: target.title },
+      order: order.map((movie) => ({
+        id: movie.id,
+        title: movie.title,
+        runtimeMinutes: movie.runtimeMinutes,
+        watched: movie.watched,
+      })),
+      watchedCount: order.length - unwatched.length,
+      totalCount: order.length,
+      remainingRuntimeMinutes: unwatched.reduce((sum, movie) => sum + movie.runtimeMinutes, 0),
+  };
+}
+
+module.exports = { listMovies, createMovie, updateMovie , getRewatchOrder };

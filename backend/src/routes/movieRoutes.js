@@ -7,5 +7,6 @@ const router = express.Router();
 router.post('/', asyncHandler(movieController.createMovie));
 router.get('/', asyncHandler(movieController.listMovies));
 router.patch('/:id', asyncHandler(movieController.updateMovie));
+router.get('/:id/rewatch-order', asyncHandler(movieController.getRewatchOrder));
 
 module.exports = router;

@@ -23,4 +23,10 @@ async function updateMovie(req, res) {
   res.json(movie);
 }
 
-module.exports = { createMovie, listMovies, updateMovie };
+async function getRewatchOrder(req, res) {
+  const id = validateMovieId(req.params.id);
+  const result = await movieService.getRewatchOrder(id);
+  res.json(result);
+}
+
+module.exports = { createMovie, listMovies, updateMovie, getRewatchOrder };
