@@ -1,14 +1,7 @@
 import { useEffect, useState } from 'react';
-import { listCinemas, createCinema, getBookingQuote } from '../api/cinemas';
+import { listCinemas, getBookingQuote} from '../api/cinemas';
 import { describeError } from '../api/client';
 
-// "2, 5" or "2 5" -> [2, 5]. Anything that isn't a number becomes NaN so the backend rejects it.
-function parseSizes(text) {
-  return text
-    .split(/[\s,]+/)
-    .filter((part) => part !== '')
-    .map(Number);
-}
 
 export default function BookingView() {
   const [cinemas, setCinemas] = useState([]);
@@ -18,9 +11,7 @@ export default function BookingView() {
   const [cinemaId, setCinemaId] = useState('');
   const [groupSize, setGroupSize] = useState('');
   const [quote, setQuote] = useState(null);
-
-  const [newName, setNewName] = useState('');
-  const [newSizes, setNewSizes] = useState('');
+  const [quoting, setQuoting] = useState(false);
 
   async function refresh(selectId) {
     try {
@@ -36,46 +27,38 @@ export default function BookingView() {
     }
   }
 
-  // Load the cinemas once, when this screen appears
   useEffect(() => {
     refresh();
   }, []);
 
-  async function handleAddCinema(event) {
-    event.preventDefault();
-    try {
-      const created = await createCinema({ name: newName, bundleSizes: parseSizes(newSizes) });
-      setNewName('');
-      setNewSizes('');
-      setQuote(null);
-      await refresh(created.id);
-    } catch (err) {
-      setError(describeError(err));
-    }
-  }
+
 
   async function handleQuote(event) {
     event.preventDefault();
+    setQuoting(true);
     try {
       setQuote(await getBookingQuote(cinemaId, groupSize));
       setError('');
     } catch (err) {
       setQuote(null);
       setError(describeError(err));
+    } finally {
+      setQuoting(false);
     }
   }
 
-  const selected = cinemas.find((cinema) => String(cinema.id) === cinemaId);
+
+  const selected = cinemas.find((c) => String(c.id) === cinemaId);
 
   return (
     <div>
-      {error && <p className="error">{error}</p>}
+      {error && <p className="error" role="alert">{error}</p>}
 
       <section className="card">
         <h2>Book a watch party</h2>
         {loading && <p className="muted">Loading...</p>}
         {!loading && cinemas.length === 0 && (
-          <p className="muted">No cinemas yet. Add one below.</p>
+          <p className="muted">No cinemas yet. Add one below to get a booking quote.</p>
         )}
 
         {cinemas.length > 0 && (
@@ -85,15 +68,10 @@ export default function BookingView() {
                 Cinema
                 <select
                   value={cinemaId}
-                  onChange={(e) => {
-                    setCinemaId(e.target.value);
-                    setQuote(null);
-                  }}
+                  onChange={(e) => { setCinemaId(e.target.value); setQuote(null); }}
                 >
-                  {cinemas.map((cinema) => (
-                    <option key={cinema.id} value={cinema.id}>
-                      {cinema.name}
-                    </option>
+                  {cinemas.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
                   ))}
                 </select>
               </label>
@@ -104,23 +82,28 @@ export default function BookingView() {
                   type="number"
                   min="1"
                   max="10000"
+                  step="1"
                   value={groupSize}
-                  onChange={(e) => {
-                    setGroupSize(e.target.value);
-                    setQuote(null);
-                  }}
+                  onChange={(e) => { setGroupSize(e.target.value); setQuote(null); }}
                 />
               </label>
             </div>
             {selected && (
-              <p className="muted">Bundle sizes: {selected.bundleSizes.join(', ')} seats</p>
+              <p className="chips-line">
+                <span className="muted">Bundles sold:</span>
+                {selected.bundleSizes.map((size) => (
+                  <span key={size} className="chip">{size} seats</span>
+                ))}
+              </p>
             )}
-            <button className="btn" type="submit">Get quote</button>
+            <button className="btn" type="submit" disabled={quoting}>
+              {quoting ? 'Working it out...' : 'Get quote'}
+            </button>
           </form>
         )}
 
         {quote && quote.possible && (
-          <div className="quote">
+          <div className="quote" role="status">
             <p>
               <strong>
                 {quote.totalBundles} {quote.totalBundles === 1 ? 'bundle' : 'bundles'}
@@ -128,44 +111,41 @@ export default function BookingView() {
               for {quote.groupSize} seats at {quote.cinema.name}:
             </p>
             <ul className="quote-list">
-              {quote.bundles.map((bundle) => (
-                <li key={bundle.size}>
-                  {bundle.size}-seat bundle × {bundle.count}
-                </li>
+              {quote.bundles.map((b) => (
+                <li key={b.size}>{b.size}-seat bundle × {b.count}</li>
               ))}
             </ul>
           </div>
         )}
 
         {quote && !quote.possible && (
-          <p className="quote quote-none">
+          <p className="quote quote-none" role="status">
             <strong>Not possible.</strong> No combination of this cinema&apos;s bundles adds up to
             exactly {quote.groupSize} seats.
           </p>
         )}
       </section>
 
-      <section className="card">
-        <h2>Add a cinema</h2>
-        <form onSubmit={handleAddCinema}>
-          <div className="form-row">
-            <label className="field">
-              Name
-              <input required value={newName} onChange={(e) => setNewName(e.target.value)} />
-            </label>
-            <label className="field">
-              Bundle sizes (1-10 different sizes, 1-500 each)
-              <input
-                required
-                placeholder="e.g. 2, 5"
-                value={newSizes}
-                onChange={(e) => setNewSizes(e.target.value)}
-              />
-            </label>
-          </div>
-          <button className="btn" type="submit">Add cinema</button>
-        </form>
-      </section>
+    
+
+      {cinemas.length > 0 && (
+        <section className="card">
+          <h2>Cinemas ({cinemas.length})</h2>
+          <ul className="cinema-list">
+            {cinemas.map((c) => (
+              <li key={c.id} className="cinema-item">
+                <span className="movie-title">{c.name}</span>
+                <span className="chips-line">
+                  {c.bundleSizes.map((size) => (
+                    <span key={size} className="chip">{size}</span>
+                  ))}
+                </span>
+
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </div>
   );
 }
