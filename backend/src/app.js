@@ -2,7 +2,10 @@ const express = require('express');
 const cors = require('cors');
 const db = require('./db');
 const movieRoutes = require('./routes/movieRoutes');
+const cinemaRoutes = require('./routes/cinemaRoutes');
 const { notFound, errorHandler } = require('./middlewares/errorHandler');
+
+
 
 const app = express();
 
@@ -25,6 +28,7 @@ app.get('/api/health/db', async (req, res) => {
 });
 
 app.use('/api/movies', movieRoutes);
+app.use('/api/cinemas', cinemaRoutes);
 
 // These two must stay last
 app.use(notFound);
