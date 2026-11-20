@@ -47,4 +47,16 @@ function validateCinemaId(raw) {
   return id;
 }
 
-module.exports = { validateCreateCinema, validateCinemaId };
+// groupSize comes from the URL (?groupSize=6), so it arrives as text
+function validateGroupSize(raw) {
+  if (typeof raw !== 'string' || !/^\d+$/.test(raw)) {
+    throw new AppError(400, 'VALIDATION_ERROR', 'groupSize is required and must be a whole number');
+  }
+  const groupSize = Number(raw);
+  if (groupSize < 1 || groupSize > 10000) {
+    throw new AppError(400, 'VALIDATION_ERROR', 'groupSize must be between 1 and 10000');
+  }
+  return groupSize;
+}
+
+module.exports = { validateCreateCinema, validateCinemaId, validateGroupSize };

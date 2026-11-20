@@ -1,5 +1,9 @@
 const cinemaService = require('../services/cinemaService');
-const { validateCreateCinema } = require('../validators/cinemaValidator');
+const {
+  validateCreateCinema,
+  validateCinemaId,
+  validateGroupSize,
+} = require('../validators/cinemaValidator');
 
 async function createCinema(req, res) {
   const data = validateCreateCinema(req.body);
@@ -12,4 +16,11 @@ async function listCinemas(req, res) {
   res.json(cinemas);
 }
 
-module.exports = { createCinema, listCinemas };
+async function getBookingQuote(req, res) {
+  const id = validateCinemaId(req.params.id);
+  const groupSize = validateGroupSize(req.query.groupSize);
+  const quote = await cinemaService.getBookingQuote(id, groupSize);
+  res.json(quote);
+}
+
+module.exports = { createCinema, listCinemas, getBookingQuote };

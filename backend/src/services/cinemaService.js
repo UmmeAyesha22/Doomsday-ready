@@ -1,4 +1,5 @@
 const db = require('../db');
+const { findMinBundles } = require('../algorithms/bookingQuote');
 const AppError = require('../errors/AppError');
 
 // One query that returns a cinema together with its bundle sizes
@@ -59,4 +60,26 @@ async function createCinema(data) {
   }
 }
 
-module.exports = { listCinemas, createCinema, getCinema };
+async function getBookingQuote(id, groupSize) {
+  const cinema = await getCinema(id);
+  const result = findMinBundles(cinema.bundleSizes, groupSize);
+
+  const quote = {
+    cinema: { id: cinema.id, name: cinema.name },
+    groupSize,
+  };
+
+  if (result === null) {
+    return {
+      ...quote,
+      possible: false,
+      totalBundles: null,
+      bundles: [],
+      message: `Not possible: no combination of bundle sizes adds up to exactly ${groupSize} seats`,
+    };
+  }
+
+  return { ...quote, possible: true, totalBundles: result.totalBundles, bundles: result.bundles };
+}
+
+module.exports = { listCinemas, createCinema, getCinema, getBookingQuote };

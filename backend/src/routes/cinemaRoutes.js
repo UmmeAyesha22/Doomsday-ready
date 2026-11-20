@@ -6,5 +6,6 @@ const router = express.Router();
 
 router.post('/', asyncHandler(cinemaController.createCinema));
 router.get('/', asyncHandler(cinemaController.listCinemas));
+router.get('/:id/booking', asyncHandler(cinemaController.getBookingQuote));
 
 module.exports = router;
