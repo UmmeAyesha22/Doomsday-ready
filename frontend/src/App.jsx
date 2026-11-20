@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import MoviesView from './components/MoviesView';
+import RewatchView from './components/RewatchView';
 
-const views = [{ id: 'movies', label: 'Movies', component: MoviesView }];
+const views = [
+  { id: 'movies', label: 'Movies', component: MoviesView },
+  { id: 'rewatch', label: 'Rewatch Plan', component: RewatchView },
+];
 
 export default function App() {
   const [activeId, setActiveId] = useState('movies');

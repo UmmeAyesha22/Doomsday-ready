@@ -53,3 +53,15 @@ button { font: inherit; }
 .movie-title.watched { text-decoration: line-through; color: #667085; }
 .movie-meta { font-size: 0.85rem; color: #667085; }
 .actions { display: flex; gap: 8px; margin-top: 8px; }
+
+
+.progress-summary { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+.progress-bar { height: 10px; background: #e4e7ee; border-radius: 999px; overflow: hidden; margin-bottom: 16px; }
+.progress-fill { height: 100%; background: #5b21b6; border-radius: 999px; transition: width 0.25s ease; }
+
+.rewatch-list { list-style: none; padding: 0; margin: 0; }
+.rewatch-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid #eef0f5; }
+.rewatch-item:first-child { border-top: none; }
+.rewatch-step { width: 1.5rem; text-align: right; color: #98a2b3; font-size: 0.85rem; }
+.rewatch-item .movie-title { flex: 1; }
+.rewatch-target { margin: 12px 0 0; padding-top: 12px; border-top: 2px solid #e4e7ee; }
