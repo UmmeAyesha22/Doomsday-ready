@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import MoviesView from './components/MoviesView';
 import RewatchView from './components/RewatchView';
+import BookingView from './components/BookingView';
+
 
 const views = [
   { id: 'movies', label: 'Movies', component: MoviesView },
   { id: 'rewatch', label: 'Rewatch Plan', component: RewatchView },
+  { id: 'booking', label: 'Booking', component: BookingView },
 ];
 
 export default function App() {

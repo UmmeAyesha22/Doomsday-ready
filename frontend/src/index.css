@@ -65,3 +65,9 @@ button { font: inherit; }
 .rewatch-step { width: 1.5rem; text-align: right; color: #98a2b3; font-size: 0.85rem; }
 .rewatch-item .movie-title { flex: 1; }
 .rewatch-target { margin: 12px 0 0; padding-top: 12px; border-top: 2px solid #e4e7ee; }
+
+
+.quote { margin-top: 16px; padding: 12px 14px; background: #f3effb; border-radius: 8px; }
+.quote p { margin: 0 0 6px; }
+.quote-list { margin: 0; padding-left: 20px; }
+.quote-none { background: #fef3f2; color: #b42318; margin-bottom: 0; }
