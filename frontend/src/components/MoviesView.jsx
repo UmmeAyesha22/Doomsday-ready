@@ -124,7 +124,9 @@ export default function MoviesView() {
       </section>
 
       <section className="card">
-        <h2>Movies ({movies.length})</h2>
+        <h2>
+          Movies <span className="count">{movies.length}</span>
+        </h2>
         {loading && <p className="muted">Loading...</p>}
         {!loading && movies.length === 0 && <p className="muted">No movies yet.</p>}
 
@@ -141,11 +143,16 @@ export default function MoviesView() {
                 <div className={movie.watched ? 'movie-title watched' : 'movie-title'}>
                   {movie.title}
                 </div>
-                <div className="movie-meta">
-                  {movie.releaseYear} · {movie.runtimeMinutes} min
-                  {movie.prerequisites.length > 0 &&
-                    ` · Watch first: ${movie.prerequisites.map(titleOf).join(', ')}`}
+              <div className="movie-meta">
+                  <span className="chip">{movie.releaseYear}</span>
+                  <span className="chip">{movie.runtimeMinutes} min</span>
+                  {movie.watched && <span className="chip chip-done">Watched</span>}
                 </div>
+                {movie.prerequisites.length > 0 && (
+                  <div className="movie-prereqs">
+                    Watch first: {movie.prerequisites.map(titleOf).join(', ')}
+                  </div>
+                )}
 
                 {editingId === movie.id ? (
                   <div>

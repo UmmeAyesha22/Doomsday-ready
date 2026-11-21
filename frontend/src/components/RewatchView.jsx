@@ -114,7 +114,7 @@ export default function RewatchView() {
       <section className="card">
         <label className="field">
           I want to get ready for
-          <select value={targetId ?? ''} onChange={handleChangeTarget}>
+                    <select className="select-custom" value={targetId ?? ''} onChange={handleChangeTarget}>
             {movies.map((movie) => (
               <option key={movie.id} value={movie.id}>
                 {movie.title} ({movie.releaseYear})

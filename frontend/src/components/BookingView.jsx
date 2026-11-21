@@ -58,7 +58,7 @@ export default function BookingView() {
         <h2>Book a watch party</h2>
         {loading && <p className="muted">Loading...</p>}
         {!loading && cinemas.length === 0 && (
-          <p className="muted">No cinemas yet. Add one below to get a booking quote.</p>
+                    <p className="muted">No cinemas available yet.</p>
         )}
 
         {cinemas.length > 0 && (
@@ -67,6 +67,7 @@ export default function BookingView() {
               <label className="field">
                 Cinema
                 <select
+                  className="select-custom"
                   value={cinemaId}
                   onChange={(e) => { setCinemaId(e.target.value); setQuote(null); }}
                 >
@@ -130,7 +131,9 @@ export default function BookingView() {
 
       {cinemas.length > 0 && (
         <section className="card">
-          <h2>Cinemas ({cinemas.length})</h2>
+          <h2>
+            Cinemas <span className="count">{cinemas.length}</span>
+          </h2>
           <ul className="cinema-list">
             {cinemas.map((c) => (
               <li key={c.id} className="cinema-item">

@@ -18,6 +18,7 @@ export default function App() {
   return (
     <div className="app">
       <header className="app-header">
+        <span className="badge">Avengers: Doomsday · Opening night</span>
         <h1>Doomsday Ready</h1>
         <p className="muted">Plan your MCU rewatch and book the opening-night watch party.</p>
       </header>
@@ -35,6 +36,9 @@ export default function App() {
       </nav>
 
       <ActiveView />
+     <footer className="app-footer">
+        Sample data for  processing not an official MCU watch guide.
+      </footer>
     </div>
   );
 }
