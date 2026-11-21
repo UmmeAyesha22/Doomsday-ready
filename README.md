@@ -18,11 +18,7 @@ A small full-stack app that helps MCU fans plan their rewatch before *Avengers: 
 docker compose up --build
 ```
 
-Open http://localhost:5173 (the API is on http://localhost:3000). To load the sample data (the 8 MCU movies and the 4 example cinemas), run this in a second terminal:
-
-```bash
-docker compose exec backend npm run db:seed
-```
+Open http://localhost:5173 (the API is on http://localhost:3000). The tables are created and filled with the sample data (the 8 MCU movies and the 4 example cinemas) automatically on start.
 
 ## Run the tests
 
@@ -100,7 +96,7 @@ erDiagram
 ## How I used AI tools
 
 - **Setup and backend:** planning the stack, the SQL schema, and the Express routes, services and validators.
-- **Algorithms:** Claude explained the ideas and helped me write them. They use no libraries that solve these problems.
+- **Algorithms:** Claude explained the ideas and helped me write them.
 - **Tests and frontend:** Claude helped write the unit tests and some of the the React views.
 - **Troubleshooting:** I used it to understand errors from Docker, git and the terminal.
 
