@@ -7,9 +7,12 @@ export class ApiError extends Error {
   }
 }
 
+const PRODUCTION_API_URL = 'https://doomsday-ready-vxwd.onrender.com';
+const API_BASE = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? PRODUCTION_API_URL : '');
+
 // Calls the backend (the Vite proxy forwards /api to port 3000)
 export async function request(path, options = {}) {
-  const response = await fetch(`/api${path}`, {
+  const response = await fetch(`${API_BASE}/api${path}`, {
     headers: { 'Content-Type': 'application/json' },
     ...options,
   });
